@@ -1,0 +1,76 @@
+import React from 'react'
+import DashboardLayout from '../layouts/DashboardLayout'
+import AuthLayout from '../layouts/AuthLayout'
+
+// Lazy loading des pages
+const Home = React.lazy(() => import('../pages/dashboard/Home'))
+const PlanFormation = React.lazy(() => import('../pages/dashboard/PlanFormation'))
+const DemandesFormation = React.lazy(() => import('../pages/dashboard/DemandesFormation'))
+const Users = React.lazy(() => import('../pages/dashboard/Users'))
+const Settings = React.lazy(() => import('../pages/dashboard/Settings'))
+const Login = React.lazy(() => import('../pages/auth/Login'))
+const Register = React.lazy(() => import('../pages/auth/Register'))
+const ForgotPassword = React.lazy(() => import('../pages/auth/ForgotPassword'))
+const NotFound = React.lazy(() => import('../pages/error/NotFound'))
+
+export const dashboardRoutes = [
+  {
+    path: '/dashboard',
+    layout: DashboardLayout,
+    component: Home,
+  },
+  {
+    path: '/dashboard/plan',
+    layout: DashboardLayout,
+    component: PlanFormation,
+  },
+  {
+    path: '/dashboard/demandes',
+    layout: DashboardLayout,
+    component: DemandesFormation,
+  },
+  {
+    path: '/dashboard/users',
+    layout: DashboardLayout,
+    component: Users,
+  },
+  {
+    path: '/dashboard/settings',
+    layout: DashboardLayout,
+    component: Settings,
+  },
+]
+
+export const authRoutes = [
+  {
+    path: '/auth/login',
+    layout: AuthLayout,
+    component: Login,
+  },
+  {
+    path: '/auth/register',
+    layout: AuthLayout,
+    component: Register,
+  },
+  {
+    path: '/auth/forgot-password',
+    layout: AuthLayout,
+    component: ForgotPassword,
+  },
+  {
+    path: '/auth/test',
+    layout: null, // Pas de layout pour la route de test, on utilise DashboardProvider directement
+    component: Home, // Route de test qui affiche Home
+  },
+]
+
+export const errorRoutes = [
+  {
+    path: '*',
+    layout: null,
+    component: NotFound,
+  },
+]
+
+export default [...dashboardRoutes, ...authRoutes, ...errorRoutes]
+

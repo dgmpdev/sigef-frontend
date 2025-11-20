@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import PageWrapper from '../../components/animations/PageWrapper'
 import './login.css'
 
 const chips = ['Sûr et conforme', 'Rapidité & UX', 'Responsive']
@@ -8,7 +9,8 @@ const getInitialTheme = () => {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-const Login = () => {
+const LoginContent = () => {
+  console.log('LoginContent rendering') // Debug
   const [theme, setTheme] = useState(getInitialTheme)
   const [showPassword, setShowPassword] = useState(false)
   const toggleLabel = useMemo(
@@ -126,6 +128,15 @@ const Login = () => {
         </section>
       </main>
     </div>
+  )
+}
+
+const Login = () => {
+  console.log('Login component rendering') // Debug
+  return (
+    <PageWrapper>
+      <LoginContent />
+    </PageWrapper>
   )
 }
 

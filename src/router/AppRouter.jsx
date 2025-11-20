@@ -1,39 +1,95 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import AuthLayout from '../layouts/AuthLayout.jsx'
-import DashboardLayout from '../layouts/DashboardLayout.jsx'
-import Login from '../pages/auth/Login.jsx'
-import Register from '../pages/auth/Register.jsx'
-import ForgotPassword from '../pages/auth/ForgotPassword.jsx'
-import Home from '../pages/dashboard/Home.jsx'
-import Users from '../pages/dashboard/Users.jsx'
-import Settings from '../pages/dashboard/Settings.jsx'
-import NotFound from '../pages/error/NotFound.jsx'
-import ProtectedRoute from './ProtectedRoute.jsx'
+import { Suspense } from 'react'
+import ProtectedRoute from './ProtectedRoute'
+import PageSkeleton from '../components/ui/skeletons/PageSkeleton'
+import { DashboardProvider } from '../contexts/DashboardContext'
+import { dashboardRoutes, authRoutes, errorRoutes } from './routes'
 
 const AppRouter = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<Navigate to="/auth/login" replace />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-      <Route element={<AuthLayout />}>
-        <Route path="/auth/login" element={<Login />} />
-        <Route path="/auth/register" element={<Register />} />
-        <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-        <Route path="/auth/test" element={<Home />} />
-      </Route>
+      {/* Auth Routes */}
+      {authRoutes.map((route) => {
+        if (route.path === '/auth/test') {
+          return (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={
+                <DashboardProvider>
+                  <Suspense fallback={<PageSkeleton />}>
+                    <route.component />
+                  </Suspense>
+                </DashboardProvider>
+              }
+            />
+          )
+        }
 
+        return (
+          <Route
+            key={route.path}
+            path={route.path}
+            element={
+              route.layout ? (
+                <route.layout>
+                  <Suspense fallback={<PageSkeleton />}>
+                    <route.component />
+                  </Suspense>
+                </route.layout>
+              ) : (
+                <Suspense fallback={<PageSkeleton />}>
+                  <route.component />
+                </Suspense>
+              )
+            }
+          />
+        )
+      })}
+
+      {/* Protected Dashboard Routes */}
       <Route element={<ProtectedRoute />}>
-        <Route element={<DashboardLayout />}>
-          <Route path="/dashboard" element={<Home />} />
-          <Route path="/dashboard/users" element={<Users />} />
-          <Route path="/dashboard/settings" element={<Settings />} />
-        </Route>
+        {dashboardRoutes.map((route) => (
+          <Route
+            key={route.path}
+            path={route.path}
+            element={
+              <DashboardProvider>
+                <route.layout>
+                  <Suspense fallback={<PageSkeleton />}>
+                    <route.component />
+                  </Suspense>
+                </route.layout>
+              </DashboardProvider>
+            }
+          />
+        ))}
       </Route>
 
-      <Route path="*" element={<NotFound />} />
+      {/* Error Routes */}
+      {errorRoutes.map((route) => (
+        <Route
+          key={route.path}
+          path={route.path}
+          element={
+            route.layout ? (
+              <route.layout>
+                <Suspense fallback={<PageSkeleton />}>
+                  <route.component />
+                </Suspense>
+              </route.layout>
+            ) : (
+              <Suspense fallback={<PageSkeleton />}>
+                <route.component />
+              </Suspense>
+            )
+          }
+        />
+      ))}
     </Routes>
   </BrowserRouter>
 )
 
 export default AppRouter
-
