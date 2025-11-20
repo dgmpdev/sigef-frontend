@@ -18,9 +18,9 @@ const SidebarItem = ({ item, active, onClick }) => {
     // Navigation basée sur l'ID de l'item
     const routeMap = {
       dashboard: '/dashboard',
-      plan: '/dashboard/plan',
-      demandes: '/dashboard/demandes',
-      catalogue: '/dashboard/catalogue',
+      plan: '/plan-formation',
+      demandes: '/demandes-formation',
+      catalogue: '/formations',
       settings: '/dashboard/settings',
     }
 

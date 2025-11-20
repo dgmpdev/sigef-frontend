@@ -1,9 +1,8 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { Suspense } from 'react'
 import ProtectedRoute from './ProtectedRoute'
-import PageSkeleton from '../components/ui/skeletons/PageSkeleton'
 import { DashboardProvider } from '../contexts/DashboardContext'
 import { dashboardRoutes, authRoutes, errorRoutes } from './routes'
+import DashboardLayout from '../layouts/DashboardLayout'
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -11,61 +10,36 @@ const AppRouter = () => (
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
       {/* Auth Routes */}
-      {authRoutes.map((route) => {
-        if (route.path === '/auth/test') {
-          return (
-            <Route
-              key={route.path}
-              path={route.path}
-              element={
-                <DashboardProvider>
-                  <Suspense fallback={<PageSkeleton />}>
-                    <route.component />
-                  </Suspense>
-                </DashboardProvider>
-              }
-            />
-          )
-        }
+      {authRoutes.map((route) => (
+        <Route
+          key={route.path}
+          path={route.path}
+          element={
+            route.layout ? (
+              <route.layout>
+                <route.component />
+              </route.layout>
+            ) : (
+              <route.component />
+            )
+          }
+        />
+      ))}
 
-        return (
-          <Route
-            key={route.path}
-            path={route.path}
-            element={
-              route.layout ? (
-                <route.layout>
-                  <Suspense fallback={<PageSkeleton />}>
-                    <route.component />
-                  </Suspense>
-                </route.layout>
-              ) : (
-                <Suspense fallback={<PageSkeleton />}>
-                  <route.component />
-                </Suspense>
-              )
-            }
-          />
-        )
-      })}
-
-      {/* Protected Dashboard Routes */}
+      {/* Protected Dashboard Area with persistent layout */}
       <Route element={<ProtectedRoute />}>
-        {dashboardRoutes.map((route) => (
-          <Route
-            key={route.path}
-            path={route.path}
-            element={
-              <DashboardProvider>
-                <route.layout>
-                  <Suspense fallback={<PageSkeleton />}>
-                    <route.component />
-                  </Suspense>
-                </route.layout>
-              </DashboardProvider>
-            }
-          />
-        ))}
+        <Route
+          path="/"
+          element={
+            <DashboardProvider>
+              <DashboardLayout />
+            </DashboardProvider>
+          }
+        >
+          {dashboardRoutes.map((route) => (
+            <Route key={route.path} path={route.path} element={<route.component />} />
+          ))}
+        </Route>
       </Route>
 
       {/* Error Routes */}
@@ -76,14 +50,10 @@ const AppRouter = () => (
           element={
             route.layout ? (
               <route.layout>
-                <Suspense fallback={<PageSkeleton />}>
-                  <route.component />
-                </Suspense>
+                <route.component />
               </route.layout>
             ) : (
-              <Suspense fallback={<PageSkeleton />}>
-                <route.component />
-              </Suspense>
+              <route.component />
             )
           }
         />

@@ -4,8 +4,8 @@ import AuthLayout from '../layouts/AuthLayout'
 
 // Lazy loading des pages
 const Home = React.lazy(() => import('../pages/dashboard/Home'))
-const PlanFormation = React.lazy(() => import('../pages/dashboard/PlanFormation'))
-const DemandesFormation = React.lazy(() => import('../pages/dashboard/DemandesFormation'))
+const PlanFormation = React.lazy(() => import('../pages/metier/PlanFormation.jsx'))
+const DemandesFormation = React.lazy(() => import('../pages/metier/DemandesFormation.jsx'))
 const Users = React.lazy(() => import('../pages/dashboard/Users'))
 const Settings = React.lazy(() => import('../pages/dashboard/Settings'))
 const Login = React.lazy(() => import('../pages/auth/Login'))
@@ -20,12 +20,12 @@ export const dashboardRoutes = [
     component: Home,
   },
   {
-    path: '/dashboard/plan',
+    path: '/plan-formation',
     layout: DashboardLayout,
     component: PlanFormation,
   },
   {
-    path: '/dashboard/demandes',
+    path: '/demandes-formation',
     layout: DashboardLayout,
     component: DemandesFormation,
   },

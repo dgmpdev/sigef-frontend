@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import useLogin from '../../hooks/users/useLogin'
 import PageWrapper from '../../components/animations/PageWrapper'
 import './login.css'
 
@@ -11,12 +13,48 @@ const getInitialTheme = () => {
 
 const LoginContent = () => {
   console.log('LoginContent rendering') // Debug
+  const navigate = useNavigate()
   const [theme, setTheme] = useState(getInitialTheme)
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(true)
+  const [formError, setFormError] = useState('')
+
+  const { mutate, isPending, error, reset } = useLogin({
+    onSuccess: () => {
+      // Optionnel: gérer "remember me" ici si une stratégie différente de stockage est souhaitée
+      navigate('/dashboard', { replace: true })
+    },
+  })
+
   const toggleLabel = useMemo(
     () => (theme === 'dark' ? 'Mode clair' : 'Mode sombre'),
     [theme],
   )
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setFormError('')
+
+    // Validation minimale côté client
+    if (!email.trim()) {
+      setFormError("L'email est requis")
+      const el = document.getElementById('email')
+      if (el) el.focus()
+      return
+    }
+    if (!password) {
+      setFormError('Le mot de passe est requis')
+      const el = document.getElementById('password')
+      if (el) el.focus()
+      return
+    }
+
+    // Lancer la mutation de login
+    reset()
+    mutate({ email: email.trim(), password })
+  }
 
   return (
     <div className="page" data-theme={theme}>
@@ -70,7 +108,7 @@ const LoginContent = () => {
             <p>Entrez vos identifiants pour continuer</p>
           </div>
 
-          <form className="form">
+          <form className="form" onSubmit={handleSubmit} noValidate>
             <div className="field">
               <input
                 id="email"
@@ -78,6 +116,10 @@ const LoginContent = () => {
                 name="email"
                 placeholder=" "
                 autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isPending}
+                required
               />
               <label htmlFor="email">Email</label>
             </div>
@@ -89,6 +131,10 @@ const LoginContent = () => {
                 name="password"
                 placeholder=" "
                 autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isPending}
+                required
               />
               <label htmlFor="password">Mot de passe</label>
               <button
@@ -96,6 +142,7 @@ const LoginContent = () => {
                 className="visibility-toggle"
                 onClick={() => setShowPassword((prev) => !prev)}
                 aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                disabled={isPending}
               >
                 {showPassword ? '🙈' : '👁️'}
               </button>
@@ -103,24 +150,41 @@ const LoginContent = () => {
 
             <div className="form-meta">
               <label className="remember">
-                <input type="checkbox" defaultChecked /> Se souvenir
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  disabled={isPending}
+                />{' '}
+                Se souvenir
               </label>
-              <button type="button" className="link">
+              <Link to="/auth/forgot-password" className="link" aria-disabled={isPending}>
                 Mot de passe oublié ?
-              </button>
+              </Link>
             </div>
 
-            <button type="submit" className="cta">
-              Connexion
+            {(formError || error) && (
+              <div className="form-error" role="alert" aria-live="assertive">
+                {formError || (error?.response?.data?.message ?? error?.message ?? 'Erreur de connexion')}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="cta"
+              disabled={isPending}
+              aria-busy={isPending}
+            >
+              {isPending ? 'Connexion…' : 'Connexion'}
             </button>
 
             <div className="card-actions">
               <button type="button" className="subtle">
                 Aide
               </button>
-              <button type="button" className="subtle">
+              <Link to="/auth/register" className="subtle" aria-disabled={isPending}>
                 S’inscrire
-              </button>
+              </Link>
             </div>
           </form>
 

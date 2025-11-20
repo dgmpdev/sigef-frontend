@@ -1,0 +1,227 @@
+
+@RestController
+@RequestMapping("/users")
+@RequiredArgsConstructor
+public class UserController
+{
+    private final IUserService userService;
+
+    @PostMapping(value = "/public/login", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public AuthResponse login(@Valid @ConvertGroup(to = LoginGroup.class) @RequestBody UserDTO user)
+    {
+        return userService.login(user);
+    }
+
+    @GetMapping(value = "/refresh-token/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public AuthResponse refreshToken(@PathVariable("userId") Long userId)
+    {
+        return userService.refreshToken(userId);
+    }
+
+    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed("CRT_USR")
+    public UserDTO createUser(@Valid @ConvertGroup(to = CreateGroup.class) @RequestBody UserDTO user)
+    {
+        return userService.createUser(user);
+    }
+
+    @PostMapping(value = "/create-with-profile", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RolesAllowed("CRT_USR")
+    public UserDTO createUserWithProfile(@Valid @ConvertGroup(to = CreateGroup.class) @RequestBody CreateUserDTO user)
+    {
+        return userService.createUserWithProfile(user);
+    }
+
+    @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public UserDTO updateUser(@Valid @ConvertGroup(to = UpdateGroup.class) @RequestBody UserDTO user)
+    {
+        return userService.updateUser(user);
+    }
+
+    @PutMapping(value = "/change-password", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void changePassword(@Valid @ConvertGroup(to = ChangePasswordGroup.class) @RequestBody UserDTO user)
+    {
+        userService.changePassword(user);
+    }
+
+    @PutMapping(value = "/public/reset-password", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void resetPassword(@Valid @ConvertGroup(to = ResetPasswordGroup.class) @RequestBody UserDTO user)
+    {
+        userService.resetPassword(user);
+    }
+
+    @GetMapping("/send-activation-email/{userId}")
+    public void envoyerEmailActivation(@PathVariable("userId") Long userId)
+    {
+        userService.sendActivationEmail(userId);
+    }
+
+    @PutMapping("/block/{userId}")
+    public void blockUser(@PathVariable("userId") Long userId)
+    {
+        userService.blockUser(userId);
+    }
+
+    @PutMapping("/unblock/{userId}")
+    public void unblockUser(@PathVariable("userId") Long userId)
+    {
+        userService.unblockUser(userId);
+    }
+
+    @PutMapping(value = "/activate", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void activateAccount(@Valid @ConvertGroup(to = ActivateAccountGroup.class) @RequestBody UserDTO user)
+    {
+        userService.activateAccount(user);
+    }
+
+    @GetMapping("/send-reset-password-email/{userId}")
+    public void envoyerEmailReinitialisation(@PathVariable("userId") Long userId)
+    {
+        userService.sendResetPasswordEmail(userId);
+    }
+
+    @PostMapping(value = "/public/send-reset-password-email", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void envoyerEmailReinitialisation(@Valid @ConvertGroup(to = SendResetPasswordEmailGroup.class) @RequestBody UserDTO dto)
+    {
+        userService.sendResetPasswordEmail(dto.getEmail());
+    }
+
+    @GetMapping("/search")
+    public Page<UserDTO> searchUsers(
+            @RequestParam(value = "key", required = false) String key,
+            @RequestParam(value = "strId", required = false) Long strId,
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size)
+    {
+        return userService.searchUsers(key, strId, PageRequest.of(page, size));
+    }
+
+    @GetMapping("/list/visible")
+    @RolesAllowed("GET_USR")
+    public List<UserDTO> getVisibleUsers()
+    {
+        return userService.getVisibleUsers();
+    }
+}
+
+@Data @AllArgsConstructor @NoArgsConstructor
+public class AuthResponse
+{
+    private String message;
+    private String accessToken;
+    private String refreshToken;
+
+    public AuthResponse(String accessToken, String refreshToken)
+    {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+    }
+}
+
+public class UserDTO
+{
+    @NotNull(message = "L'identifiant de l'utilisateur ne peut pas être nul", groups = {UpdateGroup.class, ChangePasswordGroup.class, ActivateAccountGroup.class, ResetPasswordGroup.class})
+    @ExistingUserId(message = "L'utilisateur n'existe pas", allowNull = true, groups = {UpdateGroup.class, ChangePasswordGroup.class, ActivateAccountGroup.class, ResetPasswordGroup.class})
+    @ActiveUser(groups = {ChangePasswordGroup.class, ResetPasswordGroup.class})
+    @NotBlockedUser(groups = {ChangePasswordGroup.class, ResetPasswordGroup.class})
+    private Long userId;
+    @Column(unique = true, nullable = false)
+    @NotNull(message = "L'email de l'utilisateur ne peut pas être nul", groups = {CreateGroup.class, LoginGroup.class, SendResetPasswordEmailGroup.class})
+    @UniqueEmail(message = "L'email est déjà utilisé", groups = {CreateGroup.class})
+    @Email(message = "L'email est invalide", groups = {CreateGroup.class, UpdateGroup.class})
+    @ActiveUser(groups = {LoginGroup.class})
+    @NotBlockedUser(groups = {LoginGroup.class})
+    @ExistingEmail(allowNull = true, groups = {LoginGroup.class, SendResetPasswordEmailGroup.class})
+    private String email;
+    //@NotNull(message = "Le matricule de l'utilisateur ne peut pas être nul", groups = {CreateGroup.class})
+    @UniqueMatricule
+    private String matricule;
+    @ExistingGradeCode(message = "Grade inconnu", groups = {CreateGroup.class, UpdateGroup.class}, allowNull = true)
+    private String gradeCode;
+    @NotNull(message = "Le prénom ne peut pas être nul")
+    private String firstName;
+    @NotNull(message = "Le nom de famille ne peut pas être nul")
+    private String lastName;
+    @NotNull(message = "Le numéro de téléphone ne peut pas être nul", groups = {CreateGroup.class, UpdateGroup.class})
+    @UniqueTel(message = "Le numéro de téléphone est déjà utilisé", groups = {CreateGroup.class})
+    private String tel;
+    @NotNull(message = "Le mot de passe ne peut pas être nul", groups = {ChangePasswordGroup.class, ActivateAccountGroup.class, ResetPasswordGroup.class, LoginGroup.class})
+    private String password;
+    @NotNull(message = "La confirmation du mot de passe ne peut pas être nulle", groups = {ChangePasswordGroup.class, ActivateAccountGroup.class, ResetPasswordGroup.class})
+    private String rePassword;
+    @NotNull(message = "L'ancien mot de passe ne peut pas être nul", groups = {ChangePasswordGroup.class})
+    private String oldPassword;
+    @NotNull(message = "Aucun token fourni", groups = {ActivateAccountGroup.class, ResetPasswordGroup.class})
+    @NotExpiredToken(message = "Lien expiré", groups = {ActivateAccountGroup.class, ResetPasswordGroup.class})
+    @NotAlreadyUsedToken(message = "Lien déjà utilisé", groups = {ActivateAccountGroup.class, ResetPasswordGroup.class})
+    private String authToken;
+    private LocalDate changePasswordDate;
+    private boolean activated = false;
+    private boolean notBlocked = true;
+    private LocalDateTime lastLogin;
+    @ExistingStrId(allowNull = true, groups = {CreateGroup.class, UpdateGroup.class})
+    private Long strId;
+    private String strName;
+    private String strSigle;
+    private String chaineSigles;
+
+    public UserDTO(Long userId, String email, String firstName, String lastName, String tel, LocalDate changePasswordDate, boolean activated, boolean notBlocked, LocalDateTime lastLogin, Long strId, String strName, String strSigle, String chaineSigles)
+    {
+        this.userId = userId;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.tel = tel;
+        this.changePasswordDate = changePasswordDate;
+        this.activated = activated;
+        this.notBlocked = notBlocked;
+        this.lastLogin = lastLogin;
+        this.strId = strId;
+        this.strName = strName;
+        this.strSigle = strSigle;
+        this.chaineSigles = chaineSigles;
+    }
+}
+
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@NotNull(message = "Les données de l'utilisateur ne peuvent pas être nulles")
+@CreateUserDateValidator(groups = {CreateGroup.class})
+@ProfileMaxAssignation(groups = {CreateGroup.class})
+@UniqueMatricule(groups = {UpdateGroup.class})
+public class CreateUserDTO
+{
+    @NotNull(message = "L'email de l'utilisateur ne peut pas être nul", groups = {CreateGroup.class})
+    @UniqueEmail(message = "L'email est déjà utilisé", groups = {CreateGroup.class})
+    @Email(message = "L'email est invalide", groups = {CreateGroup.class})
+    private String email;
+
+    @NotNull(message = "Le prénom ne peut pas être nul")
+    private String firstName;
+
+    @NotNull(message = "Le nom de famille ne peut pas être nul")
+    private String lastName;
+
+    @NotNull(message = "Le numéro de téléphone ne peut pas être nul", groups = {CreateGroup.class})
+    @UniqueTel(message = "Le numéro de téléphone est déjà utilisé", groups = {CreateGroup.class})
+    private String tel;
+    @UniqueMatricule(groups = {CreateGroup.class})
+    private String matricule;
+    @ExistingGradeCode(message = "Grade inconnu", groups = {CreateGroup.class, UpdateGroup.class}, allowNull = true)
+    private String gradeCode;
+
+    @ExistingStrId(allowNull = false, groups = {CreateGroup.class})
+    @NotNull(message = "La structure est obligatoire")
+    private Long strId; // Utiliser useVisibleStructure() pour la liste déroulante
+
+    @ExistingAuthCode(authType = "PRFL")
+    private String profileCode;
+
+    @ExistingTypeCode(message = "Type d'assignation inconnu", groups = {CreateGroup.class}, typeGroupCode = "USR_PRFL_TYPE")
+    private String userProfileAssTypeCode; // Utiliser useTypesByGroupCode("USR_PRFL_TYPE") pour la liste déroulante
+
+    private LocalDate startingDate;
+    private LocalDate endingDate;
+}
