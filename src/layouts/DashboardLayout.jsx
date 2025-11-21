@@ -21,7 +21,7 @@ const DashboardLayout = ({ children }) => {
   // Déterminer l'onglet actif depuis l'URL pour éviter les remises à zéro visuelles
   const activeFromPath = useMemo(() => {
     const path = location.pathname
-    if (path.startsWith('/plan-formation')) return 'plan'
+    if (path.startsWith('/plans-formation')) return 'plan'
     if (path.startsWith('/demandes-formation')) return 'demandes'
     if (path.startsWith('/formations')) return 'catalogue'
     if (path.startsWith('/dashboard/settings')) return 'settings'

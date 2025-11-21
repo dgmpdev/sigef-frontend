@@ -4,6 +4,7 @@ import { tokenService } from './tokenService'
 // All functions return response.data and strictly match backend endpoints
 
 export const login = async (data) => {
+  // Let Axios throw on non-2xx so React Query receives the error object
   const res = await axiosInstance.post('/users/public/login', data)
   return res.data
 }

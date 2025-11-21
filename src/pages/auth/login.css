@@ -385,3 +385,11 @@
   }
 }
 
+
+.form-error {
+  color: #dc2626; /* red-600 */
+  text-align: center;
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}

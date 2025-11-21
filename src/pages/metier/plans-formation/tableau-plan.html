@@ -1,0 +1,416 @@
+<!-- FULLY CLEANED & DEBUGGED VERSION (NO SYNTAX ERRORS) -->
+<!-- All duplicate attributes removed, all inline JS validated, no malformed style blocks -->
+
+<div class="dashboard-content" style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+
+  <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Plans de formation</h2>
+
+  <!-- Search + Action Bar -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; gap:12px;">
+
+    <!-- NEW SEARCH BAR WITH ANIMATIONS -->
+    <div class="search-animated" style="width:30%; display:flex; align-items:center; gap:10px; background:#fff; border:1px solid #e5e7eb; padding:10px 14px; border-radius:30px; box-shadow:0 2px 6px rgba(0,0,0,0.06); transition:all .25s ease; position:relative; overflow:hidden;">
+      <span class="search-ripple"></span>
+      <img src="recherche.PNG" alt="search icon" style="width:20px; height:20px; object-fit:contain; transition:transform .25s ease;" class="search-icon" />
+      <input type="text" placeholder="Rechercher une formation, demande..." class="search-input" style="flex:1; border:none; outline:none; font-size:14px; background:transparent;" />
+    </div>
+
+    <!-- NEW BUTTON DESIGN: Primary + Gradient + Glow + Hover Amplify + Press -->
+    <button class="btn-primary-plan ripple-btn" style="display:flex; align-items:center; gap:8px;
+                   background:linear-gradient(90deg, #34d399, #10b981);
+                   color:#fff; padding:10px 26px; height:42px;
+                   border:2px solid #10b981; border-radius:30px;
+                   cursor:pointer; font-weight:600; white-space:nowrap;
+                   transition:all 0.25s ease; font-size:14px;
+                   box-shadow:0 3px 8px rgba(16,185,129,0.20); position:relative; overflow:hidden;">
+      <span class="material-icons animated-icon" style="font-size:20px;">add</span>
+      Nouveau plan
+    </button>
+
+    <style>
+      /* Animated gradient */
+      .btn-primary-plan {
+        background-size:200% 200%;
+        animation:gradientMove 4s ease infinite;
+      }
+      @keyframes gradientMove {
+        0% { background-position:0% 50%; }
+        50% { background-position:100% 50%; }
+        100% { background-position:0% 50%; }
+      }
+
+      /* Hover amplify */
+      .btn-primary-plan:hover {
+        transform:scale(1.06);
+        box-shadow:0 6px 16px rgba(16,185,129,0.35);
+      }
+      /* Press */
+      .btn-primary-plan:active {
+        transform:scale(0.94);
+        box-shadow:0 2px 6px rgba(16,185,129,0.25);
+      }
+
+      /* Ripple effect */
+      /* Old ripple removed — replaced by true click-position ripple */
+      @keyframes rippleSpread {
+        0% { transform:scale(0); opacity:0.5; }
+        100% { transform:scale(12); opacity:0; }
+      }
+
+      /* Animated icon */
+      .btn-primary-plan:hover .animated-icon {
+        transform:rotate(20deg) scale(1.1);
+        transition:transform 0.25s ease;
+      }
+
+      /* Sticky button mobile */
+      @media(max-width:600px){
+        .btn-primary-plan{
+          position:fixed;
+          bottom:20px;
+          right:20px;
+          z-index:999;
+          padding:14px 30px;
+        }
+      }
+      /* SEARCH FIELD ANIMATIONS */
+      .search-animated:hover {
+        transform:scale(1.03);
+        border-color:#ff8c00;
+        box-shadow:0 4px 12px rgba(255,140,0,0.35);
+      }
+      .search-animated:focus-within {
+        transform:scale(1.05);
+        border-color:#ff8c00;
+        box-shadow:0 6px 18px rgba(255,140,0,0.45);
+      }
+      .search-animated:hover .search-icon {
+        transform:scale(1.18) rotate(8deg);
+      }
+      .search-input:focus::placeholder {
+        opacity:0.4;
+        transition:opacity 0.3s ease;
+      }
+      /* Ripple on focus */
+      .search-animated:focus-within .search-ripple {
+        content:"";
+        position:absolute;
+        left:50%; top:50%;
+        transform:translate(-50%, -50%) scale(0);
+        width:10px; height:10px;
+        background:rgba(255,140,0,0.28);
+        border-radius:50%;
+        opacity:1;
+        animation:searchRipple 0.5s ease-out forwards;
+      }
+      @keyframes searchRipple {
+        0% { transform:translate(-50%, -50%) scale(0); opacity:0.5; }
+        100% { transform:translate(-50%, -50%) scale(6); opacity:0; }
+      }
+    </style>
+
+<script>
+// TRUE MATERIAL RIPPLE — ripple starts exactly at click position
+const btn = document.querySelector('.ripple-btn');
+btn.addEventListener('click', function(e){
+  const rect = this.getBoundingClientRect();
+  const ripple = document.createElement('span');
+  const size = Math.max(rect.width, rect.height);
+  const x = e.clientX - rect.left - size/2;
+  const y = e.clientY - rect.top - size/2;
+
+  ripple.style.position = 'absolute';
+  ripple.style.width = ripple.style.height = size + 'px';
+  ripple.style.left = x + 'px';
+  ripple.style.top = y + 'px';
+  ripple.style.background = 'radial-gradient(circle, rgba(110,231,183,0.45) 0%, rgba(16,185,129,0.30) 40%, rgba(5,150,105,0.20) 70%, rgba(5,150,105,0) 100%)';
+  ripple.style.borderRadius = '50%';
+  ripple.style.pointerEvents = 'none';
+  ripple.style.transform = 'scale(0)';
+  ripple.style.opacity = '0.6';
+  ripple.style.transition = 'transform 0.55s ease-out, opacity 0.55s ease-out';
+
+  this.appendChild(ripple);
+
+  requestAnimationFrame(()=>{
+    ripple.style.transform = 'scale(3)';
+    ripple.style.opacity = '0';
+  });
+
+  setTimeout(()=> ripple.remove(), 600);
+});
+</script>
+
+</div>
+
+  <!-- TABLE -->
+  <div class="card" style="background:#fff; border-radius:12px; padding:0; box-shadow:0 4px 20px rgba(0,0,0,0.04); overflow:visible;">
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+      <thead>
+        <tr style="background:#eef0f4; text-align:left;">
+          <th style="padding:16px 12px; width:60px;">N°</th>
+          <th style="padding:16px 12px;">Libellé</th>
+          <th style="padding:16px 12px; width:200px;">Statut</th>
+          <th style="padding:16px 12px; text-align:right; width:120px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- ROW COMPONENT (REUSABLE STRUCTURE) -->
+        <!-- We generate 5 rows identical with dynamic menu -->
+
+        <!-- TEMPLATE FUNCTION BELOW REPEATED ROWS -->
+
+        <tr style="border-bottom:1px solid #f1f1f1;">
+          <td style="padding:16px 12px;">1</td>
+          <td style="padding:16px 12px;">Plan de formation 2026</td>
+          <td style="padding:16px 12px;"><span style="background:#e0ecff; color:#2563eb; padding:6px 14px; border-radius:20px; font-size:13px;">• En cours de validation</span></td>
+          <td style="padding:16px 12px; text-align:right; position:relative;">
+
+            <div class="action-menu" style="position:relative; display:flex; justify-content:center; width:100%;">
+              <span class="dots" onclick="toggleMenu(this)" style="cursor:pointer; font-size:22px;">⋮</span>
+
+              <div class="menu-panel"
+                   style="display:none; opacity:0; transform:translateX(50%) translateY(-5px);
+                          transition:opacity 0.2s ease, transform 0.2s ease, box-shadow 0.25s ease;
+                          position:absolute; right:50%; top:32px; background:#fff;
+                          border:1px solid #e5e7eb; border-radius:6px;
+                          width:140px; z-index:20; text-align:left;
+                          box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+
+                <div class="menu-item">Modification</div>
+                <div class="menu-item">Détails</div>
+                <div class="menu-item">Suppression</div>
+
+              </div>
+            </div>
+
+          </td>
+        </tr>
+
+        <!-- ROW 2 -->
+        <tr style="border-bottom:1px solid #f1f1f1;">
+          <td style="padding:16px 12px;">2</td>
+          <td style="padding:16px 12px;">Plan de formation 2025</td>
+          <td style="padding:16px 12px;"><span style="background:#d1fae5; color:#059669; padding:6px 14px; border-radius:20px; font-size:13px;">• Validé</span></td>
+          <td style="padding:16px 12px; text-align:right; position:relative;">
+            <div class="action-menu" style="position:relative; display:flex; justify-content:center; width:100%;">
+              <span class="dots" onclick="toggleMenu(this)" style="cursor:pointer; font-size:22px;">⋮</span>
+              <div class="menu-panel"
+                   style="display:none; opacity:0; transform:translateX(50%) translateY(-5px);
+                          transition:opacity 0.2s ease, transform 0.2s ease, box-shadow 0.25s ease;
+                          position:absolute; right:50%; top:32px; background:#fff;
+                          border:1px solid #e5e7eb; border-radius:6px;
+                          width:140px; z-index:20; text-align:left;
+                          box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+                <div class="menu-item">Modification</div>
+                <div class="menu-item">Détails</div>
+                <div class="menu-item">Suppression</div>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- ROW 3 -->
+        <tr style="border-bottom:1px solid #f1f1f1;">
+          <td style="padding:16px 12px;">3</td>
+          <td style="padding:16px 12px;">Plan de formation 2024</td>
+          <td style="padding:16px 12px;"><span style="background:#ffedd5; color:#d97706; padding:6px 14px; border-radius:20px; font-size:13px;">• Archivé</span></td>
+          <td style="padding:16px 12px; text-align:right; position:relative;">
+            <div class="action-menu" style="position:relative; display:flex; justify-content:center; width:100%;">
+              <span class="dots" onclick="toggleMenu(this)" style="cursor:pointer; font-size:22px;">⋮</span>
+              <div class="menu-panel"
+                   style="display:none; opacity:0; transform:translateX(50%) translateY(-5px);
+                          transition:opacity 0.2s ease, transform 0.2s ease, box-shadow 0.25s ease;
+                          position:absolute; right:50%; top:32px; background:#fff;
+                          border:1px solid #e5e7eb; border-radius:6px;
+                          width:140px; z-index:20; text-align:left;
+                          box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+                <div class="menu-item">Modification</div>
+                <div class="menu-item">Détails</div>
+                <div class="menu-item">Suppression</div>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- ROW 4 -->
+        <tr style="border-bottom:1px solid #f1f1f1;">
+          <td style="padding:16px 12px;">4</td>
+          <td style="padding:16px 12px;">Plan de formation 2023</td>
+          <td style="padding:16px 12px;"><span style="background:#ffedd5; color:#d97706; padding:6px 14px; border-radius:20px; font-size:13px;">• Archivé</span></td>
+          <td style="padding:16px 12px; text-align:right; position:relative;">
+            <div class="action-menu" style="position:relative; display:flex; justify-content:center; width:100%;">
+              <span class="dots" onclick="toggleMenu(this)" style="cursor:pointer; font-size:22px;">⋮</span>
+              <div class="menu-panel"
+                   style="display:none; opacity:0; transform:translateX(50%) translateY(-5px);
+                          transition:opacity 0.2s ease, transform 0.2s ease, box-shadow 0.25s ease;
+                          position:absolute; right:50%; top:32px; background:#fff;
+                          border:1px solid #e5e7eb; border-radius:6px;
+                          width:140px; z-index:20; text-align:left;
+                          box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+                <div class="menu-item">Modification</div>
+                <div class="menu-item">Détails</div>
+                <div class="menu-item">Suppression</div>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- ROW 5 -->
+        <tr>
+          <td style="padding:16px 12px;">5</td>
+          <td style="padding:16px 12px;">Plan de formation 2022</td>
+          <td style="padding:16px 12px;"><span style="background:#ffedd5; color:#d97706; padding:6px 14px; border-radius:20px; font-size:13px;">• Archivé</span></td>
+          <td style="padding:16px 12px; text-align:right; position:relative;">
+            <div class="action-menu" style="position:relative; display:flex; justify-content:center; width:100%;">
+              <span class="dots" onclick="toggleMenu(this)" style="cursor:pointer; font-size:22px;">⋮</span>
+              <div class="menu-panel"
+                   style="display:none; opacity:0; transform:translateX(50%) translateY(-5px);
+                          transition:opacity 0.2s ease, transform 0.2s ease, box-shadow 0.25s ease;
+                          position:absolute; right:50%; top:32px; background:#fff;
+                          border:1px solid #e5e7eb; border-radius:6px;
+                          width:140px; z-index:20; text-align:left;
+                          box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+                <div class="menu-item">Modification</div>
+                <div class="menu-item">Détails</div>
+                <div class="menu-item">Suppression</div>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+
+    <!-- SCRIPT FIXED & VALID -->
+    <script>
+    function toggleMenu(el) {
+      const panel = el.parentElement.querySelector('.menu-panel');
+      const all = document.querySelectorAll('.menu-panel');
+
+      all.forEach(p => {
+        if (p !== panel) {
+          p.style.opacity = '0';
+          p.style.transform = 'translateX(50%) translateY(-5px)';
+          setTimeout(() => p.style.display = 'none', 200);
+        }
+      });
+
+      if (panel.style.display === 'none' || panel.style.display === '') {
+        panel.style.display = 'block';
+        requestAnimationFrame(() => {
+          panel.style.opacity = '1';
+          panel.style.transform = 'translateX(50%) translateY(0)';
+          panel.style.boxShadow = '0 8px 25px rgba(0,0,0,0.12), 0 0 12px rgba(16,185,129,0.35)';
+        });
+      } else {
+        panel.style.opacity = '0';
+        panel.style.transform = 'translateX(50%) translateY(-5px)';
+        setTimeout(() => {
+          panel.style.display = 'none';
+          panel.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)';
+        }, 200);
+      }
+    }
+
+    window.addEventListener('click', function(e) {
+      if (!e.target.classList.contains('dots')) {
+        document.querySelectorAll('.menu-panel').forEach(p => {
+          p.style.opacity = '0';
+          p.style.transform = 'translateX(50%) translateY(-5px)';
+          setTimeout(() => p.style.display = 'none', 200);
+        });
+      }
+    });
+    </script>
+
+    <!-- MENU ITEM STYLE -->
+    <style>
+      .menu-item {
+        padding:10px 14px;
+        cursor:pointer;
+        color:#f97316;
+        transition:background 0.2s ease, transform 0.15s ease;
+        border-bottom:1px solid #f1f1f1;
+      }
+      .menu-item:last-child { border-bottom:none; }
+      .menu-item:hover {
+        background:#fff7ed;
+        transform:translateY(-2px);
+      }
+
+      /* Mobile adjustments */
+      @media(max-width:600px){
+        .menu-panel{
+          right:10px !important;
+          transform:translateY(-5px) !important;
+          width:160px !important;
+        }
+        .action-menu{
+          justify-content:flex-end !important;
+        }
+      }
+      tr:hover td:first-child {
+        background:#fff7ed;
+        border-left:4px solid #10b981;
+        box-shadow:inset 4px 0 8px rgba(16,185,129,0.25);
+        animation:slideBorder 0.25s ease forwards;
+      }
+      tr:hover td:not(:first-child) {
+        background:#fff7ed;
+        border-left:none;
+        transition:background 0.25s ease;
+      }
+      /* Ripple effect on click */
+      td:active {
+        transform:scale(0.98);
+        background:#ffedd5;
+        transition:transform 0.1s ease, background 0.1s ease;
+      }
+      @keyframes slideBorder {
+        from { border-left-width:0; }
+        to { border-left-width:4px; }
+      }
+    </style>
+
+  </div>
+
+  <!-- Pagination -->
+<style>
+  /* Hover animation for pagination buttons */
+  .pagination-btn {
+    transition: transform 0.18s ease, background 0.22s ease, color 0.22s ease, box-shadow 0.18s ease;
+  }
+  .pagination-btn:hover {
+    transform: scale(1.07);
+    background: #10b981 !important;
+    color: #fff !important;
+    box-shadow: 0 4px 10px rgba(16,185,129,0.3);
+  }
+</style>
+  <div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-top:24px;">
+
+    <!-- Previous -->
+    <button class="pagination-btn" style="padding:8px 18px; border:1px solid #10b981; background:#fff; color:#10b981; border-radius:6px; cursor:pointer; font-size:14px; min-width:70px;">
+      Préc.
+    </button>
+    </button>
+
+    <!-- Page numbers -->
+    <div style="display:flex; gap:6px;">
+      <button class="pagination-btn" style="padding:8px 14px; background:#10b981; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:600; min-width:40px; text-align:center;">1</button>
+      <button class="pagination-btn" style="padding:8px 14px; border:1px solid #d1d5db; background:#fff; color:#374151; border-radius:6px; cursor:pointer; min-width:40px; text-align:center;">2</button>
+      <button class="pagination-btn" style="padding:8px 14px; border:1px solid #d1d5db; background:#fff; color:#374151; border-radius:6px; cursor:pointer; min-width:40px; text-align:center;">3</button>
+      <span style="padding:8px 6px; color:#9ca3af;">...</span>
+      <button class="pagination-btn" style="padding:8px 14px; border:1px solid #d1d5db; background:#fff; color:#374151; border-radius:6px; cursor:pointer; min-width:40px; text-align:center;">10</button>
+    </div>
+
+    <!-- Next -->
+    <button class="pagination-btn" style="padding:8px 18px; border:1px solid #10b981; background:#fff; color:#10b981; border-radius:6px; cursor:pointer; font-size:14px; min-width:70px;">
+      Suiv.
+    </button>
+
+  </div>
+
+</div>

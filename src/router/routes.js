@@ -4,13 +4,13 @@ import AuthLayout from '../layouts/AuthLayout'
 
 // Lazy loading des pages
 const Home = React.lazy(() => import('../pages/dashboard/Home'))
-const PlanFormation = React.lazy(() => import('../pages/metier/PlanFormation.jsx'))
-const DemandesFormation = React.lazy(() => import('../pages/metier/DemandesFormation.jsx'))
+const PlanFormation = React.lazy(() => import('../pages/metier/plans-formation/PlanFormation.jsx'))
+const DemandesFormation = React.lazy(() => import('../pages/metier/demandes-formation/DemandesFormation.jsx'))
 const Users = React.lazy(() => import('../pages/dashboard/Users'))
 const Settings = React.lazy(() => import('../pages/dashboard/Settings'))
-const Login = React.lazy(() => import('../pages/auth/Login'))
-const Register = React.lazy(() => import('../pages/auth/Register'))
-const ForgotPassword = React.lazy(() => import('../pages/auth/ForgotPassword'))
+import Login from '../pages/auth/Login'
+import Register from '../pages/auth/Register'
+import ForgotPassword from '../pages/auth/ForgotPassword'
 const NotFound = React.lazy(() => import('../pages/error/NotFound'))
 
 export const dashboardRoutes = [
@@ -20,7 +20,7 @@ export const dashboardRoutes = [
     component: Home,
   },
   {
-    path: '/plan-formation',
+    path: '/plans-formation',
     layout: DashboardLayout,
     component: PlanFormation,
   },

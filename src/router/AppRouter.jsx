@@ -1,11 +1,14 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { Suspense } from 'react'
 import ProtectedRoute from './ProtectedRoute'
 import { DashboardProvider } from '../contexts/DashboardContext'
 import { dashboardRoutes, authRoutes, errorRoutes } from './routes'
 import DashboardLayout from '../layouts/DashboardLayout'
+import ErrorBoundary from '../components/ErrorBoundary'
 
 const AppRouter = () => (
   <BrowserRouter>
+    <Suspense fallback={<div>Chargement…</div>}>
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
@@ -17,10 +20,18 @@ const AppRouter = () => (
           element={
             route.layout ? (
               <route.layout>
-                <route.component />
+                <ErrorBoundary>
+                  <Suspense fallback={<div>Chargement…</div>}>
+                    <route.component />
+                  </Suspense>
+                </ErrorBoundary>
               </route.layout>
             ) : (
-              <route.component />
+              <ErrorBoundary>
+                <Suspense fallback={<div>Chargement…</div>}>
+                  <route.component />
+                </Suspense>
+              </ErrorBoundary>
             )
           }
         />
@@ -37,7 +48,15 @@ const AppRouter = () => (
           }
         >
           {dashboardRoutes.map((route) => (
-            <Route key={route.path} path={route.path} element={<route.component />} />
+            <Route
+              key={route.path}
+              path={route.path}
+              element={
+                <Suspense fallback={<div>Chargement…</div>}>
+                  <route.component />
+                </Suspense>
+              }
+            />
           ))}
         </Route>
       </Route>
@@ -50,15 +69,20 @@ const AppRouter = () => (
           element={
             route.layout ? (
               <route.layout>
-                <route.component />
+                <Suspense fallback={<div>Chargement…</div>}>
+                  <route.component />
+                </Suspense>
               </route.layout>
             ) : (
-              <route.component />
+              <Suspense fallback={<div>Chargement…</div>}>
+                <route.component />
+              </Suspense>
             )
           }
         />
       ))}
     </Routes>
+    </Suspense>
   </BrowserRouter>
 )
 

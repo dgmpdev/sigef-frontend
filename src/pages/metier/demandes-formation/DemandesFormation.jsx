@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
-import PageWrapper from '../../components/animations/PageWrapper.jsx'
-import Hero from '../../components/layout/hero/Hero.jsx'
-import { useDashboard } from '../../contexts/DashboardContext.jsx'
-import '../dashboard/home.css'
+import PageWrapper from '../../../components/animations/PageWrapper.jsx'
+import Hero from '../../../components/layout/hero/Hero.jsx'
+import { useDashboard } from '../../../contexts/DashboardContext.jsx'
+import '../../dashboard/home.css'
 
 const DemandesFormationContent = () => {
   const { setActive } = useDashboard()

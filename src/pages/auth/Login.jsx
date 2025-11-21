@@ -12,7 +12,6 @@ const getInitialTheme = () => {
 }
 
 const LoginContent = () => {
-  console.log('LoginContent rendering') // Debug
   const navigate = useNavigate()
   const [theme, setTheme] = useState(getInitialTheme)
   const [showPassword, setShowPassword] = useState(false)
@@ -27,6 +26,12 @@ const LoginContent = () => {
       navigate('/dashboard', { replace: true })
     },
   })
+
+  const getServerError = () => {
+    const msgs = error?.response?.data?.messages
+    if (Array.isArray(msgs) && msgs.length) return msgs.join(' ')
+    return error?.response?.data?.message ?? error?.message
+  }
 
   const toggleLabel = useMemo(
     () => (theme === 'dark' ? 'Mode clair' : 'Mode sombre'),
@@ -164,9 +169,9 @@ const LoginContent = () => {
             </div>
 
             {(formError || error) && (
-              <div className="form-error" role="alert" aria-live="assertive">
-                {formError || (error?.response?.data?.message ?? error?.message ?? 'Erreur de connexion')}
-              </div>
+              <small className="form-error" role="alert" aria-live="assertive">
+                {formError || getServerError() || 'Erreur de connexion'}
+              </small>
             )}
 
             <button
@@ -196,12 +201,8 @@ const LoginContent = () => {
 }
 
 const Login = () => {
-  console.log('Login component rendering') // Debug
-  return (
-    <PageWrapper>
-      <LoginContent />
-    </PageWrapper>
-  )
+  // Simplify: render without PageWrapper to avoid animation layout issues on auth pages
+  return <LoginContent />
 }
 
 export default Login

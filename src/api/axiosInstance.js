@@ -7,11 +7,16 @@ const axiosInstance = axios.create({
   baseURL: appConfig.apiBaseUrl,
 })
 
-// Attach access token to every request when available
+// Attach access token to every request when available, except for public endpoints
 axiosInstance.interceptors.request.use((config) => {
   const token = tokenService.getAccessToken()
-  // Only attach access token if the request didn't provide its own Authorization header
-  if (token && !(config.headers && config.headers.Authorization)) {
+
+  // Normalize URL path (may be absolute when retried)
+  const url = typeof config.url === 'string' ? config.url : ''
+  const isPublic = /\/users\/public\//.test(url)
+
+  // Only attach access token if not a public endpoint and the request didn't provide its own Authorization header
+  if (!isPublic && token && !(config.headers && config.headers.Authorization)) {
     config.headers = config.headers || {}
     config.headers.Authorization = `Bearer ${token}`
   }
