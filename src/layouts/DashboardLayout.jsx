@@ -1,10 +1,11 @@
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Suspense, useEffect, useMemo } from 'react'
 import { useDashboard } from '../contexts/DashboardContext'
 import Sidebar from '../components/layout/sidebar/Sidebar'
 import Navbar from '../components/layout/navbar/Navbar'
 import Footer from '../components/layout/footer/Footer'
 import PageSkeleton from '../components/ui/skeletons/PageSkeleton'
+import useAuth from '../hooks/useAuth'
 
 const navItems = [
   { id: 'dashboard', label: 'Tableau de bord', icon: 'grid' },
@@ -17,6 +18,8 @@ const navItems = [
 const DashboardLayout = ({ children }) => {
   const { collapsed, setCollapsed, active, setActive, darkMode, setDarkMode, greenTheme, setGreenTheme } = useDashboard()
   const location = useLocation()
+  const navigate = useNavigate()
+  const { logout } = useAuth()
 
   // Déterminer l'onglet actif depuis l'URL pour éviter les remises à zéro visuelles
   const activeFromPath = useMemo(() => {
@@ -45,6 +48,14 @@ const DashboardLayout = ({ children }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const handleLogout = () => {
+    try {
+      logout && logout()
+    } finally {
+      navigate('/auth/login', { replace: true })
+    }
+  }
+
   // Si on est utilisé en wrapper direct
   if (children) return children
 
@@ -64,6 +75,7 @@ const DashboardLayout = ({ children }) => {
             onToggleSidebar={handleSidebarToggle}
             onDarkModeToggle={() => setDarkMode((prev) => !prev)}
             onThemeToggle={() => setGreenTheme((prev) => !prev)}
+            onLogout={handleLogout}
           />
 
           <Suspense fallback={<PageSkeleton />}>

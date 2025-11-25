@@ -6,7 +6,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode'
 import PaletteIcon from '@mui/icons-material/Palette'
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 
-const Navbar = ({ onToggleSidebar, onDarkModeToggle, onThemeToggle }) => {
+const Navbar = ({ onToggleSidebar, onDarkModeToggle, onThemeToggle, onLogout }) => {
   return (
     <div className="topbar">
       <div className="top-left">
@@ -38,7 +38,7 @@ const Navbar = ({ onToggleSidebar, onDarkModeToggle, onThemeToggle }) => {
           }
           title="Notifications"
         />
-        <UserMenu />
+        <UserMenu onLogout={onLogout} />
       </div>
     </div>
   )
